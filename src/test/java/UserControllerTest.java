@@ -63,4 +63,28 @@ public class UserControllerTest extends AccountServiceMockedTest {
         assertEquals("q", array.getJSONObject(0).get("login"));
         assertEquals("a", array.getJSONObject(1).get("login"));
     }
+
+    @Test
+    public void testZeroLimit() {
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity("/api/user/top/?limit=0", String.class);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        final JSONObject response = new JSONObject(responseEntity.getBody());
+        assertEquals(ResponseCode.OK.getCode(), response.getInt("code"));
+        final JSONArray array = response.getJSONArray("content");
+        assertEquals(3, array.length());
+        assertEquals("q", array.getJSONObject(0).get("login"));
+        assertEquals("a", array.getJSONObject(1).get("login"));
+        assertEquals("s", array.getJSONObject(2).get("login"));
+    }
+
+    @Test
+    public void testTopOne() {
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity("/api/user/top/?limit=1", String.class);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        final JSONObject response = new JSONObject(responseEntity.getBody());
+        assertEquals(ResponseCode.OK.getCode(), response.getInt("code"));
+        final JSONArray array = response.getJSONArray("content");
+        assertEquals(1, array.length());
+        assertEquals("q", array.getJSONObject(0).get("login"));
+    }
 }
