@@ -176,7 +176,7 @@ public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
     }
 
     @Test
-    public void addWithMissingParameter() {
+    public void addWithMissingLogin() {
         ResponseEntity responseEntity = postUser(null, "w", "e");
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
@@ -186,8 +186,88 @@ public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
     }
 
     @Test
-    public void loginWithMissingParameter() {
+    public void addWithMissingPassword() {
+        ResponseEntity responseEntity = postUser("q", null, "e");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void addWithMissingEmail() {
+        ResponseEntity responseEntity = postUser("q", "w", null);
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void loginWithMissingLogin() {
+        ResponseEntity responseEntity = postSession(null, "b");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void loginWithMissingPassword() {
         ResponseEntity responseEntity = postSession("a", null);
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void registerWithEmptyLogin() {
+        ResponseEntity responseEntity = postUser("", "w", "e");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void registerWithEmptyPassword() {
+        ResponseEntity responseEntity = postUser("q", "", "e");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void registerWithEmptyEmail() {
+        ResponseEntity responseEntity = postUser("q", "w", "");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void loginWithEmptyLogin() {
+        ResponseEntity responseEntity = postSession("", "b");
+        assertNotNull(responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), apiResponse.getCode());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), apiResponse.getContent());
+    }
+
+    @Test
+    public void loginWithEmptyPassword() {
+        ResponseEntity responseEntity = postSession("a", "");
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         ApiResponse apiResponse = (ApiResponse) responseEntity.getBody();
