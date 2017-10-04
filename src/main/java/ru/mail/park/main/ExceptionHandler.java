@@ -11,7 +11,7 @@ public class ExceptionHandler {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @org.springframework.web.bind.annotation.ExceptionHandler(DataAccessException.class)
-    public ResponseEntity  handleDataAccessException(DataAccessException e) {
+    public ResponseEntity handleDataAccessException(DataAccessException e) {
         logger.error("Exception: ", e);
         return ApiResponse.dbError();
     }

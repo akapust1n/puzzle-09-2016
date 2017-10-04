@@ -44,11 +44,11 @@ public class MessageDeserializationTest {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("player", "a");
         jsonObject.put("opponent", "b");
-        final int[][] playerMatrix = new int[][] {{1, 2}, {3, 4}};
+        final int[][] playerMatrix = new int[][]{{1, 2}, {3, 4}};
         jsonObject.put("playerMatrix", playerMatrix);
-        final int[][] opponentMatrix = new int[][] {{5, 6}, {7, 8}};
+        final int[][] opponentMatrix = new int[][]{{5, 6}, {7, 8}};
         jsonObject.put("opponentMatrix", opponentMatrix);
-        final int[][] target = new int[][] {{9, 9}, {9, 9}};
+        final int[][] target = new int[][]{{9, 9}, {9, 9}};
         jsonObject.put("target", target);
         jsonObject.put("gameOver", true);
         jsonObject.put("win", true);

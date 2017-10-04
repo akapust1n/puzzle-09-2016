@@ -1,6 +1,6 @@
 package ru.mail.park.main;
 
-public enum  ResponseCode {
+public enum ResponseCode {
     @SuppressWarnings("EnumeratedConstantNamingConvention")
     OK(0, "OK"),
     PARAMETER_MISSING(1, "Required parameter is missing"),

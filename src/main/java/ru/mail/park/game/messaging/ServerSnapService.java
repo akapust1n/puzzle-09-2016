@@ -55,7 +55,7 @@ public class ServerSnapService {
 
     @SuppressWarnings("OverlyBroadThrowsClause")
     private void sendSnapForUser(UserProfile user, GameSession session, boolean gameOver, @Nullable String winner)
-            throws IOException{
+            throws IOException {
         final ServerSnap snap = createSnapForPlayer(session.getPlayer(user), session, gameOver, winner);
         final Message message = new Message(ServerSnap.class.getSimpleName(), objectMapper.writeValueAsString(snap));
         remotePointService.sendMessageToUser(user, message);

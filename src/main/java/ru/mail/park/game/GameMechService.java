@@ -34,7 +34,7 @@ public class GameMechService {
     private Map<UserProfile, GameSession> sessions = new ConcurrentHashMap<>();
 
     @Autowired
-    public GameMechService(RemotePointService remotePointService,ServerSnapService serverSnapService,
+    public GameMechService(RemotePointService remotePointService, ServerSnapService serverSnapService,
                            AccountService accountService) {
         this.remotePointService = remotePointService;
         this.serverSnapService = serverSnapService;

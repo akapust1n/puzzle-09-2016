@@ -3,7 +3,7 @@ package ru.mail.park.game.config;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-@ConfigurationProperties(prefix="game")
+@ConfigurationProperties(prefix = "game")
 @Component
 public class GameSettings {
     private static int squareSize;

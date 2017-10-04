@@ -14,9 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
     private boolean initialized = false;
@@ -113,7 +111,6 @@ public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
         assertEquals("a", getSuccessResponseLogin(apiResponse.getContent()));
         assertEquals("a", session.getAttribute("login"));
     }
-
 
     @Test
     public void badLogin() {
