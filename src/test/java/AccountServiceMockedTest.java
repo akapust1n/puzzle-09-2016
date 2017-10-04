@@ -27,40 +27,44 @@ public abstract class AccountServiceMockedTest {
     @MockBean
     protected SecurityService securityService;
     protected List<UserProfile> users = new ArrayList<>();
+    private boolean initialized = false;
 
     @Before
     public void init() {
-        doAnswer(invocationOnMock -> {
-            final Object[] args = invocationOnMock.getArguments();
-            String login = (String) args[0];
-            String password = (String) args[1];
-            String email = (String) args[2];
-            if (users.stream().anyMatch(user -> user.getLogin().equals(login) || user.getEmail().equals(email))) {
-                throw new UserAlreadyExistsException();
-            }
-            users.add(new UserProfile(login, email, password));
-            return null;
-        }).when(accountService).addUser(any(), any(), any());
-        doAnswer(invocationOnMock -> {
-            String login = (String) invocationOnMock.getArguments()[0];
-            return users.stream().filter(user -> user.getLogin().equals(login)).findAny().orElse(null);
-        }).when(accountService).getUserByLogin(any());
-        doAnswer(invocationOnMock -> {
-            UserProfile updatedUser = (UserProfile) invocationOnMock.getArguments()[0];
-            users.stream().filter(user -> user.getLogin().equals(updatedUser.getLogin())).findAny()
-                    .ifPresent(user -> user.setRank(updatedUser.getRank()));
-            return null;
-        }).when(accountService).updateUser(any());
-        doAnswer(invocationOnMock -> {
-            int limit = (int) invocationOnMock.getArguments()[0];
-            Stream<UserProfile> sorted = users.stream().sorted(Comparator.comparingInt(UserProfile::getRank)
-                    .reversed());
-            if (limit > 0) {
-                sorted = sorted.limit(limit);
-            }
-            return sorted.collect(Collectors.toList());
-        }).when(accountService).getTopRanked(anyInt());
-        doAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]).when(securityService).encode(any());
-        doAnswer(i -> i.getArguments()[0].equals(i.getArguments()[1])).when(securityService).matches(any(), any());
+        if (!initialized) {
+            doAnswer(invocationOnMock -> {
+                final Object[] args = invocationOnMock.getArguments();
+                String login = (String) args[0];
+                String password = (String) args[1];
+                String email = (String) args[2];
+                if (users.stream().anyMatch(user -> user.getLogin().equals(login) || user.getEmail().equals(email))) {
+                    throw new UserAlreadyExistsException();
+                }
+                users.add(new UserProfile(login, email, password));
+                return null;
+            }).when(accountService).addUser(any(), any(), any());
+            doAnswer(invocationOnMock -> {
+                String login = (String) invocationOnMock.getArguments()[0];
+                return users.stream().filter(user -> user.getLogin().equals(login)).findAny().orElse(null);
+            }).when(accountService).getUserByLogin(any());
+            doAnswer(invocationOnMock -> {
+                UserProfile updatedUser = (UserProfile) invocationOnMock.getArguments()[0];
+                users.stream().filter(user -> user.getLogin().equals(updatedUser.getLogin())).findAny()
+                        .ifPresent(user -> user.setRank(updatedUser.getRank()));
+                return null;
+            }).when(accountService).updateUser(any());
+            doAnswer(invocationOnMock -> {
+                int limit = (int) invocationOnMock.getArguments()[0];
+                Stream<UserProfile> sorted = users.stream().sorted(Comparator.comparingInt(UserProfile::getRank)
+                        .reversed());
+                if (limit > 0) {
+                    sorted = sorted.limit(limit);
+                }
+                return sorted.collect(Collectors.toList());
+            }).when(accountService).getTopRanked(anyInt());
+            doAnswer(invocationOnMock -> invocationOnMock.getArguments()[0]).when(securityService).encode(any());
+            doAnswer(i -> i.getArguments()[0].equals(i.getArguments()[1])).when(securityService).matches(any(), any());
+        }
+        initialized = true;
     }
 }
