@@ -9,23 +9,23 @@ import org.springframework.http.*;
 import org.springframework.test.context.junit4.SpringRunner;
 import ru.mail.park.Application;
 import ru.mail.park.main.ResponseCode;
-import ru.mail.park.services.DataBaseService;
+import ru.mail.park.model.UserProfile;
 
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Application.class)
-public class RegistrationControllerTest {
+public class RegistrationControllerTest extends AccountServiceMockedTest {
     @Autowired
     private TestRestTemplate restTemplate;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     @Before
+    @Override
     public void init() {
-        dataBaseService.getJdbcTemplate().execute("TRUNCATE user_profile;");
-        postUser("a", "b", "c");
+        super.init();
+        users.clear();
+        users.add(new UserProfile("a", "c", "b"));
     }
 
     @Test
@@ -35,11 +35,10 @@ public class RegistrationControllerTest {
         final JSONObject postUserResponseBody = new JSONObject(postUserResponse.getBody());
         assertEquals(ResponseCode.OK.getCode(), postUserResponseBody.getInt("code"));
         assertEquals("q", postUserResponseBody.getJSONObject("content").getString("login"));
-        final ResponseEntity<String> postSessionResponse = postSession("q", "w");
-        assertEquals(HttpStatus.OK, postSessionResponse.getStatusCode());
-        final JSONObject postSessionResponseBody = new JSONObject(postSessionResponse.getBody());
-        assertEquals(ResponseCode.OK.getCode(), postSessionResponseBody.getInt("code"));
-        assertEquals("q", postSessionResponseBody.getJSONObject("content").getString("login"));
+        UserProfile q = accountService.getUserByLogin("q");
+        assertEquals("q", q.getLogin());
+        assertEquals("w", q.getPassword());
+        assertEquals("e", q.getEmail());
     }
 
     @Test
@@ -87,11 +86,35 @@ public class RegistrationControllerTest {
         assertEquals(ResponseCode.AUTH_ERROR.getMessage(), body.getString("content"));
     }
 
+    @Test
+    public void addWithMissingParameter() {
+        ResponseEntity<String> responseEntity = postUser(null, "w", "e");
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        final JSONObject body = new JSONObject(responseEntity.getBody());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), body.getInt("code"));
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), body.getString("content"));
+    }
+
+    @Test
+    public void loginWithMissingParameter() {
+        ResponseEntity<String> responseEntity = postSession("a", null);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        final JSONObject body = new JSONObject(responseEntity.getBody());
+        assertEquals(ResponseCode.PARAMETER_MISSING.getCode(), body.getInt("code"));
+        assertEquals(ResponseCode.PARAMETER_MISSING.getMessage(), body.getString("content"));
+    }
+
     private ResponseEntity<String> postUser(String login, String password, String email) {
         final JSONObject request = new JSONObject();
-        request.put("login", login);
-        request.put("password", password);
-        request.put("email", email);
+        if (login != null) {
+            request.put("login", login);
+        }
+        if (password != null) {
+            request.put("password", password);
+        }
+        if (email != null) {
+            request.put("email", email);
+        }
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);
@@ -100,8 +123,12 @@ public class RegistrationControllerTest {
 
     private ResponseEntity<String> postSession(String login, String password) {
         final JSONObject request = new JSONObject();
-        request.put("login", login);
-        request.put("password", password);
+        if (login != null) {
+            request.put("login", login);
+        }
+        if (password != null) {
+            request.put("password", password);
+        }
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         final HttpEntity<String> entity = new HttpEntity<>(request.toString(), headers);

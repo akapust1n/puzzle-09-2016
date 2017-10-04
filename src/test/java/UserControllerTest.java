@@ -11,25 +11,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.mail.park.Application;
 import ru.mail.park.main.ResponseCode;
 import ru.mail.park.model.UserProfile;
-import ru.mail.park.services.AccountServiceImpl;
-import ru.mail.park.services.DataBaseService;
 
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings({"SpringJavaAutowiredMembersInspection", "MagicNumber"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Application.class)
-public class UserControllerTest {
+public class UserControllerTest extends AccountServiceMockedTest {
     @Autowired
     private TestRestTemplate restTemplate;
-    @Autowired
-    private AccountServiceImpl accountService;
-    @Autowired
-    private DataBaseService dataBaseService;
 
     @Before
+    @Override
     public void init() {
-        dataBaseService.getJdbcTemplate().execute("TRUNCATE user_profile;");
+        super.init();
         final UserProfile a = new UserProfile("a", "b", "c");
         final UserProfile q = new UserProfile("q", "w", "e");
         final UserProfile s = new UserProfile("s", "ss", "sss");
@@ -55,5 +50,17 @@ public class UserControllerTest {
         assertEquals("q", array.getJSONObject(0).get("login"));
         assertEquals("a", array.getJSONObject(1).get("login"));
         assertEquals("s", array.getJSONObject(2).get("login"));
+    }
+
+    @Test
+    public void testTopLimited() {
+        final ResponseEntity<String> responseEntity = restTemplate.getForEntity("/api/user/top/?limit=2", String.class);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        final JSONObject response = new JSONObject(responseEntity.getBody());
+        assertEquals(ResponseCode.OK.getCode(), response.getInt("code"));
+        final JSONArray array = response.getJSONArray("content");
+        assertEquals(2, array.length());
+        assertEquals("q", array.getJSONObject(0).get("login"));
+        assertEquals("a", array.getJSONObject(1).get("login"));
     }
 }
