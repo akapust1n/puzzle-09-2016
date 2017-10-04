@@ -70,7 +70,7 @@ public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
     }
 
     @Test
-    public void addNewUser() throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+    public void addNewUser() {
         ResponseEntity response = postUser("q", "w", "e");
         assertNotNull(response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
