@@ -22,7 +22,7 @@ public class RegistrationControllerTest extends AccountServiceMockedTest {
 
     @Before
     @Override
-    public void init() {
+    public void init() throws Exception {
         super.init();
         users.clear();
         users.add(new UserProfile("a", "c", "b"));

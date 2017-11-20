@@ -23,7 +23,7 @@ public class UserControllerTest extends AccountServiceMockedTest {
 
     @Before
     @Override
-    public void init() {
+    public void init() throws Exception {
         super.init();
         final UserProfile a = new UserProfile("a", "b", "c");
         final UserProfile q = new UserProfile("q", "w", "e");

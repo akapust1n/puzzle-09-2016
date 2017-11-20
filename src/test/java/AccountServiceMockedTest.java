@@ -30,7 +30,7 @@ public abstract class AccountServiceMockedTest {
     private boolean initialized = false;
 
     @Before
-    public void init() {
+    public void init() throws Exception {
         if (!initialized) {
             doAnswer(invocationOnMock -> {
                 final Object[] args = invocationOnMock.getArguments();

@@ -33,7 +33,7 @@ public class RegistrationControllerUnitTest extends AccountServiceMockedTest {
     @SuppressWarnings("unchecked")
     @Before
     @Override
-    public void init() {
+    public void init() throws Exception {
         super.init();
         if (!initialized) {
             registrationController = new RegistrationController(accountService, securityService);
