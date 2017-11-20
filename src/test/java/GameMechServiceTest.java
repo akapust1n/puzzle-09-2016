@@ -30,6 +30,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     private Queue<UserProfile> queue;
     private Map<UserProfile, GameSession> sessions;
 
+    @SuppressWarnings("unchecked")
     @Override
     public void init() throws Exception {
         if (!initialized) {
