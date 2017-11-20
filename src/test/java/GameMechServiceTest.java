@@ -34,6 +34,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     @Override
     public void init() throws Exception {
         if (!initialized) {
+            super.init();
             when(remotePointService.isConnected(any())).thenReturn(true);
             doAnswer(invocationOnMock -> {
                 final Object[] args = invocationOnMock.getArguments();
@@ -51,7 +52,6 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
                 sessions = (Map) sessionsField.get(gameMechService);
             }
         }
-        super.init();
         initialized = true;
         messages.clear();
         queue.clear();
