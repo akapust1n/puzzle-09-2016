@@ -61,9 +61,14 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     @Test
     public void addUsers() throws Exception {
         int userCount = 11;
-        addUsers(userCount);
-        int queueSize = queue.size();
-        assertNotEquals(0, queueSize);
+        for (int i = 0; i < userCount; i++) {
+            accountService.addUser("login" + i, "email" + i, "password" + i);
+        }
+        for (int i = 0; i < userCount; i++) {
+            int finalI = i;
+            executor.execute(() -> gameMechService.addPlayer(users.get(finalI)));
+        }
+        assertNotEquals(0, queue.size());
     }
 
     @Test
@@ -94,11 +99,9 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
 
     @Test
     public void disconnectAll() throws Exception {
-        int userCount = 10;
-        addUsers(userCount);
-        for (int i = 0; i < userCount; i++) {
-            int finalI = i;
-            executor.execute(() -> gameMechService.handleDisconnect(users.get(finalI)));
+        addUsers(10);
+        for (UserProfile user : users) {
+            executor.execute(() -> gameMechService.handleDisconnect(user));
         }
         Thread.sleep(200);
         assertEquals(0, sessions.size());
