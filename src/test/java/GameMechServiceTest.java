@@ -67,19 +67,6 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     }
 
     @Test
-    public void addUsers() throws Exception {
-        int userCount = 11;
-        for (int i = 0; i < userCount; i++) {
-            accountService.addUser("login" + i, "email" + i, "password" + i);
-        }
-        for (int i = 0; i < userCount; i++) {
-            int finalI = i;
-            executor.execute(() -> gameMechService.addPlayer(users.get(finalI)));
-        }
-        assertNotEquals(0, queue.size());
-    }
-
-    @Test
     public void addEvenUsers() throws Exception {
         int userCount = 10;
         addUsers(userCount);
@@ -93,16 +80,6 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
         addUsers(userCount);
         assertEquals(1, queue.size());
         assertEquals(userCount - 1, sessions.size());
-    }
-
-    @Test
-    public void uniqueSessions() throws Exception {
-        int userCount = 10;
-        addUsers(userCount);
-        assertEquals(0, queue.size());
-        assertEquals(userCount, sessions.size());
-        Set<GameSession> uniqueSessions = new HashSet<>(sessions.values());
-        assertEquals(userCount / 2, uniqueSessions.size());
     }
 
     @Test
@@ -192,7 +169,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
         String name1 = content1.getString("player");
         boolean win1 = content1.getBoolean("win");
         JSONObject content2 = new JSONObject(message2.getContent());
-        String name2 = content1.getString("player");
+        String name2 = content2.getString("player");
         boolean win2 = content2.getBoolean("win");
         assertEquals(user1.getLogin(), name1);
         assertEquals(user2.getLogin(), name2);
