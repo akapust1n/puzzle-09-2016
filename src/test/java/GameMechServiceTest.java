@@ -1,9 +1,13 @@
+import org.json.JSONObject;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import ru.mail.park.game.GameMechService;
 import ru.mail.park.game.mechanics.GameSession;
+import ru.mail.park.game.mechanics.Player;
 import ru.mail.park.game.messaging.PlayerAction;
+import ru.mail.park.game.messaging.ServerSnap;
+import ru.mail.park.game.messaging.ServerSnapService;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.websocket.Message;
 import ru.mail.park.websocket.RemotePointService;
@@ -13,8 +17,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
@@ -24,9 +27,11 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     private RemotePointService remotePointService;
     @Autowired
     private GameMechService gameMechService;
+    @Autowired
+    private ServerSnapService serverSnapService;
     private ExecutorService executor = Executors.newFixedThreadPool(10);
     private boolean initialized = false;
-    private List<Message> messages = new ArrayList<>();
+    private Map<UserProfile, List<Message>> messages = new HashMap<>();
     private Queue<UserProfile> queue;
     private Map<UserProfile, GameSession> sessions;
 
@@ -38,7 +43,10 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
             when(remotePointService.isConnected(any())).thenReturn(true);
             doAnswer(invocationOnMock -> {
                 final Object[] args = invocationOnMock.getArguments();
-                messages.add((Message) args[1]);
+                UserProfile user = (UserProfile) args[0];
+                Message message = (Message) args[1];
+                List<Message> userMessages = messages.computeIfAbsent(user, k -> new ArrayList<>());
+                userMessages.add(message);
                 return null;
             }).when(remotePointService).sendMessageToUser(any(), any());
             if (queue == null) {
@@ -131,7 +139,8 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     public void gameJoinMessages() throws Exception {
         int userCount = 10;
         addUsers(userCount);
-        assertEquals(userCount, messages.size());
+        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        assertEquals(userCount, messageCount);
     }
 
     @Test
@@ -142,7 +151,8 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
             executor.execute(() -> gameMechService.addPlayerAction(users.get(0), new PlayerAction()));
         }
         Thread.sleep(200);
-        assertEquals(2 + actionCount * 2, messages.size());
+        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        assertEquals(2 + actionCount * 2, messageCount);
     }
 
     @Test
@@ -154,7 +164,40 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
             executor.execute(() -> gameMechService.addPlayerAction(users.get(n), new PlayerAction()));
         }
         Thread.sleep(200);
-        assertEquals(2 + actionCount * 2, messages.size());
+        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        assertEquals(2 + actionCount * 2, messageCount);
+    }
+
+    @Test
+    public void checkReceiver() throws Exception {
+        UserProfile user = new UserProfile("a", "b", "c");
+        Message message = new Message();
+        remotePointService.sendMessageToUser(user, message);
+        assertEquals(user, messages.keySet().stream().findAny().orElse(null));
+    }
+
+    @Test
+    public void gameOverReceivers() throws Exception {
+        UserProfile user1 = new UserProfile("a", "b", "c");
+        UserProfile user2 = new UserProfile("q", "w", "e");
+        Player player1 = new Player(user1);
+        Player player2 = new Player(user2);
+        GameSession session = new GameSession(player1, player2);
+        serverSnapService.sendGameOverSnaps(session, player1);
+        List<Message> messages1 = messages.get(user1);
+        List<Message> messages2 = messages.get(user2);
+        Message message1 = messages1.get(0);
+        Message message2 = messages2.get(0);
+        JSONObject content1 = new JSONObject(message1.getContent());
+        String name1 = content1.getString("player");
+        boolean win1 = content1.getBoolean("win");
+        JSONObject content2 = new JSONObject(message2.getContent());
+        String name2 = content1.getString("player");
+        boolean win2 = content2.getBoolean("win");
+        assertEquals(user1.getLogin(), name1);
+        assertEquals(user2.getLogin(), name2);
+        assertTrue(win1);
+        assertFalse(win2);
     }
 
     private void addUsers(int count) throws InterruptedException {
