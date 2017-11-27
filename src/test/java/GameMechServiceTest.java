@@ -6,7 +6,6 @@ import ru.mail.park.game.GameMechService;
 import ru.mail.park.game.mechanics.GameSession;
 import ru.mail.park.game.mechanics.Player;
 import ru.mail.park.game.messaging.PlayerAction;
-import ru.mail.park.game.messaging.ServerSnap;
 import ru.mail.park.game.messaging.ServerSnapService;
 import ru.mail.park.model.UserProfile;
 import ru.mail.park.websocket.Message;
