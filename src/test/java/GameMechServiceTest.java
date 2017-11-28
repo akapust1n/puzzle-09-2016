@@ -66,22 +66,6 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     }
 
     @Test
-    public void addEvenUsers() throws Exception {
-        int userCount = 10;
-        addUsers(userCount);
-        assertEquals(0, queue.size());
-        assertEquals(userCount, sessions.size());
-    }
-
-    @Test
-    public void addOddUsers() throws Exception {
-        int userCount = 11;
-        addUsers(userCount);
-        assertEquals(1, queue.size());
-        assertEquals(userCount - 1, sessions.size());
-    }
-
-    @Test
     public void disconnectAll() throws Exception {
         addUsers(10);
         for (UserProfile user : users) {
