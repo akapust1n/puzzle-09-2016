@@ -102,8 +102,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     @Test
     public void disconnectHalfUnique() throws Exception {
         addUsers(20);
-        Set<GameSession> uniqueSessions = new HashSet<>(sessions.values());
-        uniqueSessions.stream().limit(5).forEach(session -> {
+        sessions.values().stream().distinct().limit(5).forEach(session -> {
             UserProfile user = session.getFirst().getUser();
             executor.execute(() -> gameMechService.handleDisconnect(user));
         });
@@ -115,7 +114,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
     public void gameJoinMessages() throws Exception {
         int userCount = 10;
         addUsers(userCount);
-        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        int messageCount = messages.values().stream().mapToInt(List::size).sum();
         assertEquals(userCount, messageCount);
     }
 
@@ -127,7 +126,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
             executor.execute(() -> gameMechService.addPlayerAction(users.get(0), new PlayerAction()));
         }
         Thread.sleep(200);
-        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        int messageCount = messages.values().stream().mapToInt(List::size).sum();
         assertEquals(2 + actionCount * 2, messageCount);
     }
 
@@ -140,7 +139,7 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
             executor.execute(() -> gameMechService.addPlayerAction(users.get(n), new PlayerAction()));
         }
         Thread.sleep(200);
-        int messageCount = messages.values().stream().map(List::size).mapToInt(Integer::valueOf).sum();
+        int messageCount = messages.values().stream().mapToInt(List::size).sum();
         assertEquals(2 + actionCount * 2, messageCount);
     }
 
