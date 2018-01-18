@@ -48,11 +48,6 @@ public class GameMechServiceTest extends AccountServiceMockedTest {
                 userMessages.add(message);
                 return null;
             }).when(remotePointService).sendMessageToUser(any(), any());
-            doAnswer(invocationOnMock -> {
-                final Object[] args = invocationOnMock.getArguments();
-                UserProfile user = (UserProfile) args[0];
-                sessions.remove(user);
-            }).when(remotePointService).cutDownConnection(any(), any());
             if (queue == null) {
                 Field queueField = GameMechService.class.getDeclaredField("queue");
                 queueField.setAccessible(true);
